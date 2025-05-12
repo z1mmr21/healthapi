@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  health-api:
+    build: .
+    image: health-api
+    container_name: health-api-container
+    ports:
+      - "8080:8080"
+    env_file:
+      - src/.env
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
