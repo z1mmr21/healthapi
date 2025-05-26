@@ -24,7 +24,7 @@ import java.util.UUID;
 public class FileStorageService {
 
     private final S3Client s3Client;
-    private final String bucketName = "clinic-record-system";
+    private final String bucketName = "clinic-record-sys";
 
     public String uploadFile(MultipartFile file) {
         String filenameExtension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".") + 1);
@@ -33,7 +33,7 @@ public class FileStorageService {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
                     .key(key)
-                    .acl("public-read")
+                    //.acl("public-read")
                     .contentType(file.getContentType())
                     .build();
             PutObjectResponse response = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));

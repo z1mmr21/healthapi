@@ -1,20 +1,23 @@
 package in.z1mmr.healthapi.controller;
 
 
+import in.z1mmr.healthapi.entity.Role;
 import in.z1mmr.healthapi.entity.UserEntity;
 import in.z1mmr.healthapi.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Secured("ROLE_ADMIN")
 public class UserController {
     private final UserService userService;
 
@@ -35,5 +38,15 @@ public class UserController {
     @GetMapping
     public List<UserEntity> getUsers() {
         return userService.findAllUsers();
+    }
+
+    @Operation(summary = "Update user role", description = "Обновляет роль пользователя по ID")
+    @GetMapping("/change-role/{userId}/{role}")
+    public ResponseEntity<UserEntity> updateUserRole(
+            @PathVariable("userId") String userId,
+            @PathVariable("role") String  role) {
+        UserEntity updatedUser = userService.updateUserRole(userId, Role.valueOf(role.toUpperCase()));
+        System.out.println(updatedUser);
+        return ResponseEntity.ok(updatedUser);
     }
 }

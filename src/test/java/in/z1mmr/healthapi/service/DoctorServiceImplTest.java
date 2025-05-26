@@ -40,7 +40,7 @@ public class DoctorServiceImplTest {
         DoctorRequest request = new DoctorRequest("Jame", "Donk", "Cardiologist", "jame@example.com", "+1234567890");
         MultipartFile file = mock(MultipartFile.class);
 
-        String imageUrl = "https://clinic-record-system.s3.amazonaws.com/doctor_image.jpg";
+        String imageUrl = "https://clinic-record-sys.s3.amazonaws.com/doctor_image.jpg";
         when(fileStorageService.uploadFile(file)).thenReturn(imageUrl);
 
         DoctorEntity savedDoctor = DoctorEntity.builder()
@@ -185,7 +185,7 @@ public class DoctorServiceImplTest {
                 .specialization("Cardiologist")
                 .email("jame@example.com")
                 .phone("+1234567890")
-                .imageUrl("https://clinic-record-system.s3.amazonaws.com/doctor_image.jpg")
+                .imageUrl("https://clinic-record-sys.s3.amazonaws.com/doctor_image.jpg")
                 .build();
 
         when(doctorRepository.findById("1")).thenReturn(Optional.of(doctorEntity));
@@ -200,7 +200,7 @@ public class DoctorServiceImplTest {
 
     @Test
     void testUpdateDoctorAvatar() {
-        String newImageUrl = "https://clinic-record-system.s3.amazonaws.com/new_doctor_image.jpg";
+        String newImageUrl = "https://clinic-record-sys.s3.amazonaws.com/new_doctor_image.jpg";
         MultipartFile newFile = mock(MultipartFile.class);
 
         DoctorEntity existingDoctor = DoctorEntity.builder()
@@ -210,7 +210,7 @@ public class DoctorServiceImplTest {
                 .specialization("Cardiologist")
                 .email("jame@example.com")
                 .phone("+1234567890")
-                .imageUrl("https://clinic-record-system.s3.amazonaws.com/old_doctor_image.jpg")
+                .imageUrl("https://clinic-record-sys.s3.amazonaws.com/old_doctor_image.jpg")
                 .build();
 
         when(doctorRepository.findById("1")).thenReturn(Optional.of(existingDoctor));

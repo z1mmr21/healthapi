@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,6 +29,7 @@ public class PatientController {
             description = "Створює нового пацієнта з інформацією та зображенням профілю"
     )
     @PostMapping
+    @PreAuthorize("hasAnyRole('DOCTOR', 'ADMIN')")
     public PatientResponse addPatient(@RequestPart("patient") String patientString, @RequestPart("file") MultipartFile file) {
         ObjectMapper objectMapper = new ObjectMapper();
         PatientRequest request = null;
@@ -43,6 +46,7 @@ public class PatientController {
             description = "Повертає список усіх зареєстрованих пацієнтів"
     )
     @GetMapping
+    @PreAuthorize("hasAnyRole('DOCTOR', 'NURSE', 'ADMIN')")
     public List<PatientResponse> readPatients() {
         return patientService.readPatients();
     }
@@ -52,6 +56,7 @@ public class PatientController {
             description = "Повертає детальну інформацію про пацієнта за його ідентифікатором"
     )
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('DOCTOR', 'NURSE', 'ADMIN')")
     public PatientResponse readPatient(@PathVariable("id") String id) {
         return patientService.readPatient(id);
     }
@@ -62,6 +67,7 @@ public class PatientController {
     )
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAnyRole('DOCTOR', 'ADMIN')")
     public void deletePatient(@PathVariable("id") String id) {
         patientService.deletePatient(id);
     }
@@ -71,6 +77,7 @@ public class PatientController {
             description = "Оновлює особисту інформацію пацієнта за його ID"
     )
     @PutMapping
+    @PreAuthorize("hasAnyRole('DOCTOR', 'ADMIN')")
     public PatientResponse updatePatient(@RequestPart("id") String id, @RequestPart("patient") String patientString) {
         ObjectMapper objectMapper = new ObjectMapper();
         PatientRequest request = null;
@@ -87,6 +94,7 @@ public class PatientController {
             description = "Оновлює аватар пацієнта за його ID"
     )
     @PostMapping("/update-image")
+    @PreAuthorize("hasAnyRole('DOCTOR', 'ADMIN')")
     public PatientResponse updatePatientImage(@RequestPart("id") String id, @RequestPart("file") MultipartFile file) {
         /*
         ObjectMapper objectMapper = new ObjectMapper();

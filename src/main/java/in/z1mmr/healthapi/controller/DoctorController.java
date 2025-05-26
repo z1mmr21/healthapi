@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -25,6 +26,7 @@ public class DoctorController {
 
     @Operation(summary = "Додати нового лікаря", description = "Додає нового лікаря з інформацією та зображенням.")
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public DoctorResponse addDoctor(@RequestPart("doctor") String doctorString, @RequestPart("file") MultipartFile file) {
         ObjectMapper objectMapper = new ObjectMapper();
         DoctorRequest request = null;
@@ -38,12 +40,14 @@ public class DoctorController {
 
     @Operation(summary = "Отримати список усіх лікарів", description = "Повертає повний список усіх лікарів у системі.")
     @GetMapping
+    @PreAuthorize("hasAnyRole('REGISTRAR', 'NURSE', 'ADMIN')")
     public List<DoctorResponse> readDoctors() {
         return doctorService.readDoctors();
     }
 
     @Operation(summary = "Отримати інформацію про конкретного лікаря", description = "Повертає детальну інформацію про лікаря за вказаним ID.")
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('REGISTRAR', 'NURSE', 'ADMIN')")
     public DoctorResponse readDoctor(@PathVariable String id) {
         return doctorService.readDoctor(id);
     }
@@ -51,12 +55,14 @@ public class DoctorController {
     @Operation(summary = "Видалити лікаря", description = "Видаляє лікаря з бази даних за вказаним ID.")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public void deleteDoctor(@PathVariable String id) {
         doctorService.deleteDoctor(id);
     }
 
     @Operation(summary = "Оновити інформацію про лікаря", description = "Оновлює основну інформацію про лікаря.")
     @PutMapping
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public DoctorResponse updateDoctor(@RequestPart("id") String id, @RequestPart("doctor") String doctorString) {
         ObjectMapper objectMapper = new ObjectMapper();
         DoctorRequest request = null;
@@ -70,6 +76,7 @@ public class DoctorController {
 
     @Operation(summary = "Оновити зображення лікаря", description = "Оновлює фото лікаря за його ID.")
     @PostMapping("/update-image")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public DoctorResponse updateDoctorImage(@RequestPart("id") String id, @RequestPart("file") MultipartFile file) {
         /*ObjectMapper objectMapper = new ObjectMapper();
         String _id = null;

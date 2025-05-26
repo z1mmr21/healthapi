@@ -1,10 +1,9 @@
 package in.z1mmr.healthapi.security;
 
+import in.z1mmr.healthapi.entity.Role;
 import in.z1mmr.healthapi.entity.UserEntity;
-import in.z1mmr.healthapi.repository.UserRepository;
 import in.z1mmr.healthapi.service.UserServiceImpl;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -18,32 +17,42 @@ import java.util.Optional;
 @AllArgsConstructor
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
-
     private final UserServiceImpl userService;
+    private final JwtTokenProvider tokenProvider;
 
     @Override
-    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
-        OAuth2User oAuth2User = delegate.loadUser(userRequest);
+    public OAuth2User loadUser(OAuth2UserRequest request) throws OAuth2AuthenticationException {
+        OAuth2User oauth2User = new DefaultOAuth2UserService().loadUser(request);
 
-        String oauthId = oAuth2User.getName();
-        String provider = userRequest.getClientRegistration().getRegistrationId();
-        String name = (String) oAuth2User.getAttributes().get("name");
-        String email = (String) oAuth2User.getAttributes().get("email");
-        String avatarUrl = (String) oAuth2User.getAttributes().get("avatar_url");
+        String oauthId = oauth2User.getName();
+        String provider = request.getClientRegistration().getRegistrationId();
+        String name = (String) oauth2User.getAttributes().get("name");
+        String email = (String) oauth2User.getAttributes().get("email");
+        String avatarUrl = (String) oauth2User.getAttributes().get("avatar_url");
 
-        Optional<UserEntity> existingUser = userService.findUserByOauthId(oauthId);
-        if (!existingUser.isPresent()) {
-            UserEntity newUser = UserEntity.builder()
+        UserEntity user;
+
+        Optional<UserEntity> userOpt = userService.findUserByOauthId(oauthId);
+        if (userOpt.isEmpty()) {
+            Role assignedRole = userService.findAllUsers().isEmpty() ? Role.ADMIN : Role.NONE; // Если это первый пользователь, даем роль ADMIN
+
+            user = UserEntity.builder()
                     .oauthId(oauthId)
                     .provider(provider)
                     .name(name)
                     .email(email)
                     .avatarUrl(avatarUrl)
+                    .role(assignedRole)
                     .build();
-            userService.saveUser(newUser);
+
+            userService.saveUser(user);
+        } else {
+            user = userOpt.get();
+            user.setName(name);
+            user.setEmail(email);
+            user.setAvatarUrl(avatarUrl);
         }
 
-        return oAuth2User;
+        return oauth2User;
     }
 }

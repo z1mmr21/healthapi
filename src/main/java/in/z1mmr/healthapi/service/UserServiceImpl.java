@@ -1,7 +1,9 @@
 package in.z1mmr.healthapi.service;
 
+import in.z1mmr.healthapi.entity.Role;
 import in.z1mmr.healthapi.entity.UserEntity;
 import in.z1mmr.healthapi.repository.UserRepository;
+import in.z1mmr.healthapi.security.JwtTokenProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public UserEntity saveUser(UserEntity user) {
@@ -27,6 +30,27 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserEntity> findAllUsers() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public Optional<UserEntity> findUserById(String id) {
+        return userRepository.findById(id);
+    }
+
+    @Override
+    public UserEntity updateUserRole(String userId, Role newRole) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+        user.setRole(newRole);
+
+        String accessToken = jwtTokenProvider.generateToken(user.getId(), user.getRole().name(), 60);
+        String refreshToken = jwtTokenProvider.generateToken(user.getId(), user.getRole().name(), 7 * 24 * 60);
+
+        user.setAccessToken(accessToken);
+        user.setRefreshToken(refreshToken);
+
+        return userRepository.save(user);
     }
 
 }

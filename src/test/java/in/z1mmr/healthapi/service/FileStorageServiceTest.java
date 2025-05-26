@@ -49,7 +49,7 @@ class FileStorageServiceTest {
                 .thenReturn(response);
 
         String actualUrl = fileStorageService.uploadFile(file);
-        assertTrue(actualUrl.startsWith("https://clinic-record-system.s3.amazonaws.com/"));
+        assertTrue(actualUrl.startsWith("https://clinic-record-sys.s3.amazonaws.com/"));
         assertTrue(actualUrl.endsWith(".txt"));
     }
 
@@ -94,7 +94,7 @@ class FileStorageServiceTest {
                 .thenReturn(response);
 
         String actualUrl = fileStorageService.uploadDocument(content);
-        assertTrue(actualUrl.startsWith("https://clinic-record-system.s3.amazonaws.com/"));
+        assertTrue(actualUrl.startsWith("https://clinic-record-sys.s3.amazonaws.com/"));
         assertTrue(actualUrl.endsWith(".html"));
     }
 

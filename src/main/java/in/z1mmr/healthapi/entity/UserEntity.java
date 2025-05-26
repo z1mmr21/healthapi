@@ -20,4 +20,7 @@ public class UserEntity {
     private String email;
     private String avatarUrl;
     private String provider;
+    private String accessToken;
+    private String refreshToken;
+    private Role role;
 }

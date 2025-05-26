@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class MedicalRecordController {
             description = "Додає новий медичний запис для конкретного пацієнта та лікаря."
     )
     @PostMapping
+    @PreAuthorize("hasAnyRole('DOCTOR', 'REGISTRAR', 'ADMIN')")
     public ResponseEntity<MedicalRecordResponse> createMedicalRecord(
             @Valid @RequestBody MedicalRecordRequest request) {
         MedicalRecordResponse savedMedicalRecord = medicalRecordService.addMedicalRecord(request.getDoctorId(), request.getPatientId(), request);
@@ -35,6 +37,7 @@ public class MedicalRecordController {
             description = "Повертає детальний медичний запис за його унікальним ідентифікатором."
     )
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('DOCTOR', 'REGISTRAR', 'NURSE', 'ADMIN')")
     public ResponseEntity<MedicalRecordResponse> readMedicalRecordById(@PathVariable String id) {
         MedicalRecordResponse medicalRecord = medicalRecordService.getMedicalRecordById(id);
         return ResponseEntity.ok(medicalRecord);
@@ -45,6 +48,7 @@ public class MedicalRecordController {
             description = "Повертає список усіх медичних записів у системі."
     )
     @GetMapping
+    @PreAuthorize("hasAnyRole('DOCTOR', 'REGISTRAR', 'NURSE', 'ADMIN')")
     public ResponseEntity<List<MedicalRecordResponse>> getAllMedicalRecords() {
         List<MedicalRecordResponse> medicalRecords = medicalRecordService.getAllMedicalRecords();
         return ResponseEntity.ok(medicalRecords);
@@ -55,6 +59,7 @@ public class MedicalRecordController {
             description = "Оновлює існуючий медичний запис за ID."
     )
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('DOCTOR', 'ADMIN')")
     public ResponseEntity<MedicalRecordResponse> updateMedicalRecord(
             @PathVariable String id,
             @Valid @RequestBody MedicalRecordRequest request) {
@@ -67,6 +72,7 @@ public class MedicalRecordController {
             description = "Видаляє медичний запис з бази даних за вказаним ID."
     )
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('DOCTOR', 'ADMIN')")
     public ResponseEntity<Void> deleteMedicalRecord(@PathVariable String id) {
         medicalRecordService.deleteMedicalRecord(id);
         return ResponseEntity.noContent().build();
@@ -77,6 +83,7 @@ public class MedicalRecordController {
             description = "Повертає список медичних записів, пов’язаних із вказаним лікарем."
     )
     @GetMapping("/doctors/{doctorId}")
+    @PreAuthorize("hasAnyRole('DOCTOR', 'REGISTRAR', 'NURSE', 'ADMIN')")
     public ResponseEntity<List<MedicalRecordResponse>> readMedicalRecordsByDoctorId(@PathVariable String doctorId) {
         List<MedicalRecordResponse> medicalRecords = medicalRecordService.readMedicalRecordsByDoctorId(doctorId);
         return ResponseEntity.ok(medicalRecords);
@@ -87,6 +94,7 @@ public class MedicalRecordController {
             description = "Повертає список медичних записів, пов’язаних із вказаним пацієнтом."
     )
     @GetMapping("/patients/{patientId}")
+    @PreAuthorize("hasAnyRole('DOCTOR', 'REGISTRAR', 'NURSE', 'ADMIN')")
     public ResponseEntity<List<MedicalRecordResponse>> readMedicalRecordsByPatientId(@PathVariable String patientId) {
         List<MedicalRecordResponse> medicalRecords = medicalRecordService.readMedicalRecordsByPatientId(patientId);
         return ResponseEntity.ok(medicalRecords);
